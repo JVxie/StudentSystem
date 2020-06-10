@@ -1,6 +1,6 @@
 package dao.impl;
 
-import Utils.DbUtil;
+import utils.DbUtil;
 import dao.IClassDao;
 import pojo.Class;
 

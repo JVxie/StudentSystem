@@ -1,11 +1,9 @@
 package dao.impl;
 
-import Utils.DbUtil;
+import utils.DbUtil;
 import dao.IStudentDao;
-import org.apache.commons.beanutils.BeanUtils;
 import pojo.Student;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

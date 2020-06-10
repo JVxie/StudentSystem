@@ -1,6 +1,6 @@
 package dao.impl;
 
-import Utils.DbUtil;
+import utils.DbUtil;
 import dao.IAdminDao;
 import pojo.Admin;
 

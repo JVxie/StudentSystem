@@ -1,8 +1,6 @@
 package servlet;
 
-import Utils.JsonUtil;
-import com.google.gson.Gson;
-import constants.StudentSystemConstants;
+import utils.JsonUtil;
 import enums.ResponseEnum;
 import pojo.Admin;
 import service.IAdminService;
@@ -15,9 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 
 @WebServlet(name = "LoginServlet", value = "/login")

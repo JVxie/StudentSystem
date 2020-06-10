@@ -1,8 +1,7 @@
 package dao.impl;
 
-import Utils.DbUtil;
+import utils.DbUtil;
 import dao.IResultDao;
-import pojo.Class;
 import pojo.Result;
 
 import java.util.ArrayList;

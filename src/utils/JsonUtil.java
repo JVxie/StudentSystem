@@ -1,7 +1,6 @@
-package Utils;
+package utils;
 
 import com.google.gson.Gson;
-import pojo.Admin;
 import vo.ResponseVo;
 
 import javax.servlet.http.HttpServletRequest;
