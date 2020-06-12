@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>查询成绩信息</title>
+    <style type="text/css">
+        .center-div {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="center-div">
+        <h3>查询成绩信息</h3>
+        <form id="resultSearchForm">
+            请输入学生学号：<input id="studentId" name="studentId" type="text"/>
+            <button type="button" id="searchResult">查询</button>
+        </form>
+        <div id="resultTable"></div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/jquery.serializeJSON/2.9.0/jquery.serializejson.js"></script>
+        <script type="text/javascript">
+            $("#searchResult").click(function () {
+                // alert(JSON.stringify($('#studentSearchForm').serializeJSON()));
+                $.ajax({
+                    type: "GET",
+                    contentType: 'application/json; charset=UTF-8',
+                    dataType: "json",
+                    url: "./result",
+                    // data: JSON.stringify($('#studentSearchForm').serializeJSON()),
+                    data: $('#resultSearchForm').serialize(),
+                    success: function (data) {
+                        // console.log(data);
+                        var student;
+                        if (data["status"] === 0) {
+                            // console.log(data["data"])
+                            let result = data["data"];
+                            student = getStudent(result["studentId"]);
+                            for (let i = 0; i < classArray.length; ++i) {
+                                if (classArray[i]["classId"] === student["classId"]) {
+                                    student["className"] = classArray[i]["className"];
+                                }
+                            }
+                            result["className"] = student["className"];
+                            result["studentName"] = student["studentName"];
+                            let resultTable =
+                                "<table border='1'>" +
+                                "<thead>" +
+                                "<tr>" +
+                                "<th>学号</th>" +
+                                "<th>姓名</th>" +
+                                "<th>班级</th>" +
+                                "<th>平均成绩</th>" +
+                                "<th>同学互评分</th>" +
+                                "<th>品德成绩</th>" +
+                                "<th>任课教师评分</th>" +
+                                "</tr>" +
+                                "</thead>" +
+                                "<tbody>" +
+                                "<tr>" +
+                                "<td>" + student["studentId"] + "</td>" +
+                                "<td>" + student["studentName"] + "</td>" +
+                                "<td>" + student["className"] + "</td>" +
+                                "<td>" + result["resultAverage"] + "</td>" +
+                                "<td>" + result["resultMutual"] + "</td>" +
+                                "<td>" + result["resultMoral"] + "</td>" +
+                                "<td>" + result["resultTeacher"] + "</td>" +
+                                "</tr>" +
+                                "</tbody>" +
+                                "</table>";
+                            $("#resultTable").html(resultTable);
+                            // console.log(student);
+                        } else {
+                            // console.log(data);
+                            $("#resultTable").html("<p style='color: red'>" + data["msg"] + "</p>");
+                        }
+                    }
+                });
+            });
+
+            function getStudent(studentId) {
+                var result = null;
+                $.ajax({
+                    type: "GET",
+                    contentType: 'application/json; charset=UTF-8',
+                    dataType: "json",
+                    url: "./student",
+                    async: false,
+                    // data: JSON.stringify($('#studentSearchForm').serializeJSON()),
+                    data: "studentId=" + studentId,
+                    success: function (data) {
+                        if (data["status"] === 0) {
+                            result = data["data"];
+                        } else {
+                            console.log(data["msg"]);
+                        }
+                    }
+                });
+                // console.log(result);
+                return result;
+            }
+
+            // 获取所有班级的信息
+            let classArray;
+            $.ajax({
+                type: "GET",
+                contentType: 'application/json; charset=UTF-8',
+                dataType: "json",
+                url: "./class",
+                data: "",
+                success: function (data) {
+                    // console.log(data);
+                    if (data["status"] === 0) {
+                        classArray = data["data"];
+                        // console.log(classArray);
+                    } else {
+                        console.log(data["msg"]);
+                    }
+                }
+            });
+        </script>
+    </div>
+
+</body>
+</html>

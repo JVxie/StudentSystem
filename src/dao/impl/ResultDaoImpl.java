@@ -39,7 +39,7 @@ public class ResultDaoImpl implements IResultDao {
                 result.setResultAverage((Float) resultMap.get("result_average"));
                 result.setResultMutual((Float) resultMap.get("result_mutual"));
                 result.setResultMoral((Float) resultMap.get("result_moral"));
-                result.setResultMoral((Float) resultMap.get("result_moral"));
+                result.setResultTeacher((Float) resultMap.get("result_teacher"));
                 resultList.add(result);
             }
         }
@@ -49,19 +49,71 @@ public class ResultDaoImpl implements IResultDao {
     @Override
     public boolean insert(Result result) {
         String sql = "insert into result " +
-                "() " +
-                "";
-        return false;
+                "(result_id, student_id, result_average, result_mutual, result_moral, result_teacher) " +
+                "values (?, ?, ?, ?, ?, ?)";
+        boolean row = dbUtil.execute(
+                sql,
+                result.getResultId(),
+                result.getStudentId(),
+                result.getResultAverage(),
+                result.getResultMutual(),
+                result.getResultMoral(),
+                result.getResultTeacher()
+        );
+        return row;
     }
 
     @Override
     public boolean updateByStudentId(String studentId, Result result) {
-        return false;
+        String sql = "update result set ";
+        boolean flag = false;
+        List list = new ArrayList();
+        if (result.getResultAverage() != null) {
+            sql += "result_average = ?";
+            flag = true;
+            list.add(result.getResultAverage());
+        }
+        if (result.getResultMutual() != null) {
+            if (!flag) {
+                sql += "result_mutual = ?";
+                flag = true;
+            } else {
+                sql += ", result_mutual = ?";
+            }
+            list.add(result.getResultMutual());
+        }
+        if (result.getResultMoral() != null) {
+            if (!flag) {
+                sql += "result_moral = ?";
+                flag = true;
+            } else {
+                sql += ", result_moral = ?";
+            }
+            list.add(result.getResultMoral());
+        }
+        if (result.getResultTeacher() != null) {
+            if (!flag) {
+                sql += "result_teacher = ?";
+                flag = true;
+            } else {
+                sql += ", result_teacher = ?";
+            }
+            list.add(result.getResultTeacher());
+        }
+        if (!flag) {
+            return true;
+        }
+        sql += " where student_id = ?";
+        list.add(studentId);
+        Object[] objects = list.toArray();
+        boolean row = dbUtil.execute(sql, objects);
+        return row;
     }
 
     @Override
     public boolean deleteByStudentId(String studentId) {
-
-        return false;
+        String sql = "delete from result where student_id = ?";
+        boolean row = dbUtil.execute(sql, studentId);
+        return row;
     }
 }

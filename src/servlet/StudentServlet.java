@@ -4,7 +4,6 @@ package servlet;
 import utils.JsonUtil;
 import enums.ResponseEnum;
 import form.StudentUpdateForm;
-import org.apache.commons.beanutils.BeanUtils;
 import pojo.Student;
 import service.IStudentService;
 import service.impl.StudentServiceImpl;
@@ -47,34 +46,44 @@ public class StudentServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Student student = jsonUtil.readJson(request, Student.class);
-        if (student.getStudentId() == null || student.getStudentId().trim().equals("")) {
+//        Student student = jsonUtil.readJson(request, Student.class);
+        String studentId = request.getParameter("studentId");
+        if (studentId == null || studentId.trim().equals("")) {
             jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_ID_NOT_NULL));
             return ;
         }
-        ResponseVo responseVo = studentService.search(student.getStudentId());
+        ResponseVo responseVo = studentService.search(studentId);
         jsonUtil.writeJson(response, responseVo);
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         StudentUpdateForm studentUpdateForm = jsonUtil.readJson(request, StudentUpdateForm.class);
         Student student = new Student();
-        try {
-            BeanUtils.copyProperties(studentUpdateForm, student);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        student.setStudentId(studentUpdateForm.getStudentId());
+        student.setClassId(studentUpdateForm.getClassId());
+        student.setStudentName(studentUpdateForm.getStudentName());
+        student.setStudentSex(studentUpdateForm.getStudentSex());
+        student.setStudentAddress(studentUpdateForm.getStudentAddress());
+        student.setStudentPhone(studentUpdateForm.getStudentPhone());
         if (student.getStudentId().trim().equals("")) {
-            jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_ID_NOT_NULL));
-            return ;
+//            jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_ID_NOT_NULL));
+            student.setStudentId(null);
         }
         if (student.getStudentName().trim().equals("")) {
-            jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_NAME_NOT_NULL));
-            return ;
+//            jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_NAME_NOT_NULL));
+            student.setStudentName(null);
         }
-        if (student.getStudentSex() < 1 || student.getStudentSex() > 3) {
+        if (student.getStudentSex() != null && (student.getStudentSex() < 1 || student.getStudentSex() > 3)) {
             jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_SEX_ERROR));
             return ;
+        }
+        if (student.getStudentAddress().trim().equals("")) {
+//            jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_NAME_NOT_NULL));
+            student.setStudentAddress(null);
+        }
+        if (student.getStudentPhone().trim().equals("")) {
+//            jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.STUDENT_NAME_NOT_NULL));
+            student.setStudentPhone(null);
         }
         ResponseVo responseVo = studentService.update(studentUpdateForm.getStudentIdLast(), student);
         jsonUtil.writeJson(response, responseVo);

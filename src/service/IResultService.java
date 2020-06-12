@@ -9,7 +9,7 @@ public interface IResultService {
 
     ResponseVo search(String studentId);
 
-    ResponseVo update(Result result);
+    ResponseVo update(String studentId, Result result);
 
-    ResponseVo delete(Integer resultId);
+    ResponseVo delete(String studentId);
 }

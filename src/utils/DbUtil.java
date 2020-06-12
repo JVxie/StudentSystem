@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import static constants.StudentSystemConstants.DATABASE_PROPERTY_NAME;
+import static constants.StudentSystemConstants.PROPERTY_SUFFIX;
 
 /**
  * 简单封装数据库工具类
@@ -206,7 +207,7 @@ public class DbUtil {
         Properties properties = new Properties();
         try {
             String path = PathUtil.getWebInfPath();
-            path = path + DATABASE_PROPERTY_NAME;
+            path = path + DATABASE_PROPERTY_NAME + PROPERTY_SUFFIX;
             properties.load(new FileInputStream(path));
         } catch (IOException | IllegalAccessException e) {
             e.printStackTrace();

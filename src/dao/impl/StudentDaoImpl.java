@@ -1,5 +1,6 @@
 package dao.impl;
 
+import pojo.Result;
 import utils.DbUtil;
 import dao.IStudentDao;
 import pojo.Student;
@@ -7,18 +8,12 @@ import pojo.Student;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class StudentDaoImpl implements IStudentDao {
     private DbUtil dbUtil = new DbUtil();
 
-    @Override
-    public Student selectByStudentId(String studentId) {
-        String sql = "select * from student where student_id = ?";
-        Map<String, Object> studentMap = dbUtil.queryForMap(sql, studentId);
-        if (studentMap == null) {
-            return null;
-
-        }
+    private Student createStudent(Map<String, Object> studentMap) {
         Student student = new Student();
         student.setStudentId((String) studentMap.get("student_id"));
         student.setClassId((Integer) studentMap.get("class_id"));
@@ -27,6 +22,43 @@ public class StudentDaoImpl implements IStudentDao {
         student.setStudentAddress((String) studentMap.get("student_address"));
         student.setStudentPhone((String) studentMap.get("student_phone"));
         return student;
+    }
+
+    @Override
+    public Student selectByStudentId(String studentId) {
+        String sql = "select * from student where student_id = ?";
+        Map<String, Object> studentMap = dbUtil.queryForMap(sql, studentId);
+        if (studentMap == null) {
+            return null;
+        }
+        return createStudent(studentMap);
+    }
+
+    @Override
+    public List<Student> selectByClassIdSet(Set<Integer> classIdSet) {
+        StringBuilder sql;
+        List<Map<String, Object>> studentMapList;
+        List<Student> studentList = null;
+        if (classIdSet == null || classIdSet.size() <= 0) {
+            sql = new StringBuilder("select * from student");
+            studentMapList = dbUtil.queryForList(sql.toString());
+        } else {
+            sql = new StringBuilder("select * from student where class_id in (?");
+            for (int i = 1; i < classIdSet.size(); ++i) {
+                sql.append(", ?");
+            }
+            sql.append(")");
+            Object[] objects = classIdSet.toArray();
+            studentMapList = dbUtil.queryForList(sql.toString(), objects);
+        }
+        if (!studentMapList.isEmpty()) {
+            studentList = new ArrayList<>();
+            for (Map<String, Object> studentMap : studentMapList) {
+                Student student = createStudent(studentMap);
+                studentList.add(student);
+            }
+        }
+        return studentList;
     }
 
     @Override
@@ -99,6 +131,9 @@ public class StudentDaoImpl implements IStudentDao {
                 sql += ", student_phone = ?";
             }
             list.add(student.getStudentPhone());
+        }
+        if (!flag) {
+            return true;
         }
         sql += " where student_id = ?";
         list.add(studentId);

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>删除学生信息</title>
+    <style type="text/css">
+        .center-div {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="center-div">
+        <h3>删除学生信息</h3>
+        <form id="studentSearchForm">
+            请输入学生学号：<input id="studentId" name="studentId" type="text"/>
+            <button type="button" id="searchStudent">查询</button>
+        </form>
+        <div id="studentTable"></div>
+        <div id="studentDelete">
+
+        </div>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery.serializeJSON/2.9.0/jquery.serializejson.js"></script>
+    <script type="text/javascript">
+        var studentId;
+        $("#searchStudent").click(function () {
+            // 获取所有班级的信息
+            var classArray;
+            $.ajax({
+                type: "GET",
+                contentType: 'application/json; charset=UTF-8',
+                dataType: "json",
+                url: "./class",
+                data: "",
+                success: function (data) {
+                    // console.log(data);
+                    if (data["status"] === 0) {
+                        classArray = data["data"];
+                        // console.log(classArray);
+                    } else {
+                        alert(data["msg"]);
+                    }
+                }
+            });
+
+            // alert(JSON.stringify($('#studentSearchForm').serializeJSON()));
+            $.ajax({
+                type: "GET",
+                contentType: 'application/json; charset=UTF-8',
+                dataType: "json",
+                url: "./student",
+                data: $('#studentSearchForm').serialize(),
+                // data: "studentId=" + $("#studentIdLast").val(),
+                success: function (data) {
+                    // console.log(data);
+                    if (data["status"] === 0) {
+                        // console.log(data["data"])
+                        let student = data["data"];
+                        // console.log(student);
+                        studentId = student["studentId"];
+                        for (let i = 0; i < classArray.length; ++i) {
+                            if (classArray[i]["classId"] === student["classId"]) {
+                                student["className"] = classArray[i]["className"];
+                            }
+                        }
+
+                        let sex = ["", "男", "女", "其他"];
+                        let studentTable =
+                            "<table border='1'>" +
+                            "<thead>" +
+                            "<tr>" +
+                            "<th>学号</th>" +
+                            "<th>姓名</th>" +
+                            "<th>班级</th>" +
+                            "<th>性别</th>" +
+                            "<th>家庭住址</th>" +
+                            "<th>联系电话</th>" +
+                            "</tr>" +
+                            "</thead>" +
+                            "<tbody>" +
+                            "<tr>" +
+                            "<td>" + student["studentId"] + "</td>" +
+                            "<td>" + student["studentName"] + "</td>" +
+                            "<td>" + student["className"] + "</td>" +
+                            "<td>" + sex[student["studentSex"]] + "</td>" +
+                            "<td>" + student["studentAddress"] + "</td>" +
+                            "<td>" + student["studentPhone"] + "</td>" +
+                            "</tr>" +
+                            "</tbody>" +
+                            "</table>";
+                        $("#studentTable").html(studentTable);
+                        let studentDelete = "点击删除按钮以删除该学生信息：" +
+                            "<button type='button' onclick='deleteStudent()'>删除</button>";
+                        $("#studentDelete").html(studentDelete);
+                        // console.log(student);
+                    } else {
+                        // console.log(data);
+                        $("#studentTable").html("<p style='color: red'>" + data["msg"] + "</p>");
+                        $("#studentDelete").html("");
+                    }
+                }
+            });
+        });
+        function deleteStudent() {
+            $.ajax({
+                type: "DELETE",
+                contentType: 'application/json; charset=UTF-8',
+                dataType: "json",
+                url: "./student",
+                data: JSON.stringify(studentId),
+                success: function (data) {
+                    if (data["status"] === 0) {
+                        $("#studentTable").html("删除成功");
+                        $("#studentDelete").html("");
+                    } else {
+                        $("#studentDelete").html("<p style='color: red'>" + data["msg"] + "</p>");
+                    }
+                }
+            });
+        }
+
+        // 获取所有班级的信息
+        var classArray;
+        $.ajax({
+            type: "GET",
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            url: "./class",
+            data: "",
+            success: function (data) {
+                // console.log(data);
+                if (data["status"] === 0) {
+                    classArray = data["data"];
+                    // console.log(classArray);
+                } else {
+                    alert(data["msg"]);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

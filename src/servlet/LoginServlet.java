@@ -24,6 +24,10 @@ public class LoginServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Admin admin = jsonUtil.readJson(request, Admin.class);
+        if (admin == null) {
+            jsonUtil.writeJson(response, ResponseVo.error(ResponseEnum.USERNAME_OR_PASSWORD_ERROR));
+            return ;
+        }
         ResponseVo result = adminService.login(admin.getAdminId(), admin.getAdminPsw());
         HttpSession session = request.getSession();
         if (session.getAttribute("adminId") != null) {

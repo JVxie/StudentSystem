@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>增加学生信息</title>
+    <style type="text/css">
+        .center-div {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            -moz-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            -o-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="center-div">
+        <h3>增加学生信息</h3>
+        <form id="studentCreatForm">
+            学生学号：<input id="studentId" name="studentId" type="text"/>* <br />
+            学生姓名：<input id="studentName" name="studentName" type="text"/>* <br />
+            选择性别：
+            <select id="studentSex" name="studentSex">
+                <option value="1">男</option>
+                <option value="2">女</option>
+                <option value="3">其他</option>
+            </select>* <br />
+            选择班级：
+            <select id="classId" name="classId">
+            </select>* <br />
+            家庭住址：<input id="studentAddress" name="studentAddress" type="text"/> <br />
+            联系电话：<input id="studentPhone" name="studentPhone" type="text"/> <br />
+            <button type="button" id="creatStudent">添加</button>
+            <span style="color: red">注：*号为必填项</span>
+        </form>
+        <div id="studentTable"></div>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery.serializeJSON/2.9.0/jquery.serializejson.js"></script>
+    <script type="text/javascript">
+
+        $("#creatStudent").click(function () {
+            console.log($("#studentCreatForm").serializeJSON());
+            $.ajax({
+                type: "POST",
+                contentType: 'application/json; charset=UTF-8',
+                dataType: "json",
+                url: "./student",
+                data: JSON.stringify($("#studentCreatForm").serializeJSON()),
+                success: function (data) {
+                    // console.log(data);
+                    if (data["status"] === 0) {
+                        // console.log(data["data"])
+                        let student = data["data"];
+                        for (let i = 0; i < classArray.length; ++i) {
+                            if (classArray[i]["classId"] === student["classId"]) {
+                                student["className"] = classArray[i]["className"];
+                            }
+                        }
+
+                        let sex = ["", "男", "女", "其他"];
+                        let studentTable =
+                            "<p>添加成功，学生信息如下：</p>" +
+                            "<table border='1'>" +
+                            "<thead>" +
+                            "<tr>" +
+                            "<th>学号</th>" +
+                            "<th>姓名</th>" +
+                            "<th>班级</th>" +
+                            "<th>性别</th>" +
+                            "<th>家庭住址</th>" +
+                            "<th>联系电话</th>" +
+                            "</tr>" +
+                            "</thead>" +
+                            "<tbody>" +
+                            "<tr>" +
+                            "<td>" + student["studentId"] + "</td>" +
+                            "<td>" + student["studentName"] + "</td>" +
+                            "<td>" + student["className"] + "</td>" +
+                            "<td>" + sex[student["studentSex"]] + "</td>" +
+                            "<td>" + student["studentAddress"] + "</td>" +
+                            "<td>" + student["studentPhone"] + "</td>" +
+                            "</tr>" +
+                            "</tbody>" +
+                            "</table>";
+                        $("#studentTable").html(studentTable);
+                        // console.log(student);
+                    } else {
+                        // console.log(data);
+                        $("#studentTable").html("<p style='color: red'>" + data["msg"] + "</p>");
+                    }
+                }
+            });
+        });
+
+        // 获取所有班级的信息
+        var classArray;
+        $.ajax({
+            type: "GET",
+            contentType: 'application/json; charset=UTF-8',
+            dataType: "json",
+            url: "./class",
+            data: "",
+            success: function (data) {
+                // console.log(data);
+                if (data["status"] === 0) {
+                    classArray = data["data"];
+                    // console.log(classArray);
+                    for (let i = 0; i < classArray.length; ++i) {
+                        document.getElementById("classId").options.add(new Option(classArray[i]["className"],classArray[i]["classId"]));
+                    }
+                } else {
+                    alert(data["msg"]);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
